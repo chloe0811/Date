@@ -15,6 +15,11 @@
       --ink:#2b2b2b;
       --paper:#fff8f6;
       --shadow:0 14px 28px rgba(0,0,0,.12);
+      --green:#4caf50;
+      --pill:#4caf50;
+      --pillText:#fff;
+      --border:#f1d7d7;
+      --muted:#6b4b4b;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
@@ -26,7 +31,7 @@
 
     .card{
       background:var(--paper);
-      border:1.5px solid #f1d7d7;
+      border:1.5px solid var(--border);
       border-radius:18px;
       padding:32px 26px;
       width:min(720px,92vw);
@@ -53,10 +58,8 @@
       font-size:clamp(15px,2.6vw,18px);
       line-height:1.7;
     }
-
     .spice{ color:#c2185b; font-weight:600; }
-
-    .hint{ margin-top:8px; color:#6b4b4b; font-size:14px; }
+    .hint{ margin-top:8px; color:var(--muted); font-size:14px; }
 
     .big-heart{
       font-size:42px; margin-top:6px; display:inline-block;
@@ -68,6 +71,19 @@
       20%{ transform:scale(1.12) }
       60%{ transform:scale(1.07) }
     }
+
+    .cta{
+      margin-top:20px;
+      display:flex; gap:12px; justify-content:center; flex-wrap:wrap;
+    }
+    .btn{
+      border:0; border-radius:12px; padding:12px 16px; cursor:pointer;
+      font-weight:600; font-size:16px;
+      box-shadow:0 6px 14px rgba(0,0,0,.08);
+    }
+    .btn-primary{ background:var(--green); color:#fff }
+    .btn-ghost{ background:#fff; color:#555; border:1px solid #e6caca }
+    .btn:active{ transform:translateY(1px) }
 
     /* confetti */
     .confetti{
@@ -91,24 +107,54 @@
       to  { transform:translate(-50%,-120px); opacity:1 }
     }
 
-    .cta{
-      margin-top:20px;
-      display:flex; gap:12px; justify-content:center; flex-wrap:wrap;
+    /* === Popup for choices === */
+    .choice-pop{
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.45);
+      display: none; place-items: center;
+      z-index: 9999;
     }
-    .btn{
-      border:0; border-radius:12px; padding:12px 16px; cursor:pointer;
-      font-weight:600; font-size:16px;
-      box-shadow:0 6px 14px rgba(0,0,0,.08);
+    .choice-pop.show{ display: grid; }
+
+    .choice-card{
+      background: var(--paper);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 18px;
+      width: min(520px, 92vw);
+      box-shadow: var(--shadow);
+      text-align: center;
+      animation: pop .35s ease both;
     }
-    .btn-primary{ background:#4caf50; color:#fff }
-    .btn-ghost{ background:#fff; color:#555; border:1px solid #e6caca }
-    .btn:active{ transform:translateY(1px) }
+    .choice-card h2{
+      margin: 0 0 8px;
+      font-family: 'Playfair Display', serif;
+      color: var(--accent);
+      font-size: clamp(20px, 4.2vw, 28px);
+    }
+    .section-title{
+      margin: 10px 0 6px;
+      font-weight: 600; color: #7a5656; font-size: 14px;
+      text-transform: uppercase; letter-spacing: .12em;
+    }
+
+    .group{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
+    .pill{
+      border:1px solid #e8caca; background:#fff; color:#5b4a4a;
+      padding:10px 14px; border-radius:999px; cursor:pointer;
+      font-weight:600; font-size:15px; transition: all .15s ease;
+      box-shadow:0 6px 14px rgba(0,0,0,.06); user-select:none;
+    }
+    .pill:hover{ transform: translateY(-1px); }
+    .pill.active{ background:var(--pill); color:var(--pillText); border-color:var(--pill); }
+
+    .choice-actions{ display:flex; gap:10px; justify-content:center; margin-top:14px; flex-wrap:wrap; }
   </style>
 </head>
 <body>
   <main class="card" aria-live="polite">
     <h1>I knew you’d say yes.</h1>
-    <div class="sub">
+    <div class="sub" id="subcopy">
       Now let me spoil you tonight —
       stay comfy, bring that <span class="spice">kiss-stealing smile</span>,
       and save me the seat right next to you. <br/>
@@ -117,10 +163,36 @@
     <div class="hint">Table’s ready. I’ll handle the rest — you just look irresistible.</div>
 
     <div class="cta">
-      <button class="btn btn-primary" id="go">Let’s go</button>
+      <button class="btn btn-primary" id="go" aria-haspopup="dialog" aria-controls="choice">Let’s go</button>
       <button class="btn btn-ghost" id="back">Back to invite</button>
     </div>
   </main>
+
+  <!-- Choice Popup -->
+  <div class="choice-pop" id="choice" role="dialog" aria-modal="true" aria-labelledby="choiceTitle">
+    <div class="choice-card">
+      <h2 id="choiceTitle">Where shall we go tonight?</h2>
+
+      <div class="section-title">Pick a vibe</div>
+      <div class="group places" id="placeGroup">
+        <button class="pill" data-place="Florentino">🌹 Romantic</button>
+        <button class="pill" data-place="The Moat">🍷 Chill drinks</button>
+        <button class="pill" data-place="Dainty Hotpot & BBQ Buffet">🍲 Feast</button>
+      </div>
+
+      <div class="section-title">Pick a time</div>
+      <div class="group times" id="timeGroup">
+        <button class="pill" data-time="7:30 PM">7:30 PM</button>
+        <button class="pill" data-time="8:00 PM">8:00 PM</button>
+        <button class="pill" data-time="8:15 PM">8:15 PM</button>
+      </div>
+
+      <div class="choice-actions">
+        <button class="btn btn-primary" id="confirm">Confirm</button>
+        <button class="btn btn-ghost" id="cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
 
   <script>
     // === Confetti ===
@@ -132,7 +204,7 @@
       el.style.backgroundColor = colors[(Math.random()*colors.length)|0];
       el.style.width = (6 + Math.random()*6) + 'px';
       el.style.height = (8 + Math.random()*10) + 'px';
-      el.style.animationDuration = (3 + Math.random()*2) + 's'; // 3–5s
+      el.style.animationDuration = (3 + Math.random()*2) + 's';
       el.style.transform = `rotate(${Math.random()*360}deg)`;
       document.body.appendChild(el);
       setTimeout(()=> el.remove(), 5200);
@@ -157,25 +229,93 @@
       }
     }
 
-    // === Buttons ===
-    document.getElementById('go').addEventListener('click', ()=>{
-      window.location.href = 'date_night.html';
-    });
-    document.getElementById('back').addEventListener('click', ()=>{
-      window.location.href = 'index.html';
-    });
-
-    // === On load: run effects & show chosen time from query ===
+    // === On load: effects & read any existing query (?time, ?place) ===
     window.addEventListener('load', ()=>{
       confettiSnow(10000, 140);
       burstHearts();
 
-      // Read time 
       const params = new URLSearchParams(window.location.search);
       const t = params.get("time");
-      if(t){
-        document.querySelector(".sub")
-          .insertAdjacentHTML("beforeend", `<br/><strong>⏰ You picked: ${t}</strong>`);
+      const p = params.get("place");
+      if(t || p){
+        const msg = `⏰ ${p ? p : ''}${p && t ? ' at ' : ''}${t ? t : ''}`;
+        if(msg.trim()){
+          document.getElementById("subcopy")
+            .insertAdjacentHTML("beforeend", `<br/><strong>${msg}</strong>`);
+        }
+      }
+    });
+
+    // === Navigation ===
+    document.getElementById('back').addEventListener('click', ()=>{
+      window.location.href = 'index.html';
+    });
+
+    // === Choice popup logic ===
+    const popup = document.getElementById('choice');
+    const goBtn = document.getElementById('go');
+    const cancelBtn = document.getElementById('cancel');
+    const confirmBtn = document.getElementById('confirm');
+
+    const placeBtns = [...document.querySelectorAll('#placeGroup .pill')];
+    const timeBtns  = [...document.querySelectorAll('#timeGroup  .pill')];
+
+    let chosenPlace = null;
+    let chosenTime  = null;
+
+    function activate(btns, btn){
+      btns.forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    placeBtns.forEach(b=>{
+      b.addEventListener('click', ()=>{
+        activate(placeBtns, b);
+        chosenPlace = b.dataset.place;
+      });
+    });
+    timeBtns.forEach(b=>{
+      b.addEventListener('click', ()=>{
+        activate(timeBtns, b);
+        chosenTime = b.dataset.time;
+      });
+    });
+
+    goBtn.addEventListener('click', ()=>{
+      popup.classList.add('show');
+      // Default a sensible selection if none yet
+      if(!chosenPlace){ placeBtns[0].click(); }
+      if(!chosenTime){ timeBtns[0].click(); }
+    });
+
+    cancelBtn.addEventListener('click', ()=>{
+      popup.classList.remove('show');
+    });
+
+    confirmBtn.addEventListener('click', ()=>{
+      if(!chosenPlace || !chosenTime){
+        alert('Please pick a place and a time 💕');
+        return;
+      }
+      // Show selection immediately on this page
+      const sub = document.getElementById('subcopy');
+      sub.insertAdjacentHTML("beforeend",
+        `<br/><strong>⏰ ${chosenPlace} at ${chosenTime}</strong>`);
+
+      // Navigate to countdown page with params (so it knows where/when)
+      const qs = new URLSearchParams({ place: chosenPlace, time: chosenTime }).toString();
+      window.location.href = `date_night.html?${qs}`;
+    });
+
+    // Close popup on backdrop click
+    popup.addEventListener('click', (e)=>{
+      if(e.target === popup) popup.classList.remove('show');
+    });
+
+    // Keyboard: Esc to close
+    document.addEventListener('keydown', (e)=>{
+      if(e.key === 'Escape' && popup.classList.contains('show')){
+        popup.classList.remove('show');
       }
     });
   </script>
