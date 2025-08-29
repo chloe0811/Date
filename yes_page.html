@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>I knew you would say yes!</title>
 
+  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
   <style>
@@ -53,13 +54,9 @@
       line-height:1.7;
     }
 
-    .spice{
-      color:#c2185b; font-weight:600;
-    }
+    .spice{ color:#c2185b; font-weight:600; }
 
-    .hint{
-      margin-top:8px; color:#6b4b4b; font-size:14px;
-    }
+    .hint{ margin-top:8px; color:#6b4b4b; font-size:14px; }
 
     .big-heart{
       font-size:42px; margin-top:6px; display:inline-block;
@@ -126,7 +123,7 @@
   </main>
 
   <script>
-    // confetti
+    // === Confetti ===
     const colors = ["#ff6b6b","#feca57","#48dbfb","#1dd1a1","#ff9ff3","#54a0ff","#5f27cd","#ffd93d"];
     function oneConfetti(){
       const el = document.createElement('div');
@@ -145,7 +142,7 @@
       setTimeout(()=> clearInterval(iv), durationMs);
     }
 
-    // little hearts
+    // === Little hearts ===
     function burstHearts(){
       const icons = ["💓","💗","💖","💞","💘","❤️‍🔥"];
       for(let i=0;i<10;i++){
@@ -160,17 +157,26 @@
       }
     }
 
-    // action buttom
+    // === Buttons ===
     document.getElementById('go').addEventListener('click', ()=>{
       window.location.href = 'date_night.html';
     });
     document.getElementById('back').addEventListener('click', ()=>{
-      window.location.href = 'index.html'; 
+      window.location.href = 'index.html';
     });
 
+    // === On load: run effects & show chosen time from query ===
     window.addEventListener('load', ()=>{
-      confettiSnow(10000, 140);  
-      burstHearts();             
+      confettiSnow(10000, 140);
+      burstHearts();
+
+      // 讀 URL 的 ?time=
+      const params = new URLSearchParams(window.location.search);
+      const t = params.get("time");
+      if(t){
+        document.querySelector(".sub")
+          .insertAdjacentHTML("beforeend", `<br/><strong>⏰ You picked: ${t}</strong>`);
+      }
     });
   </script>
 </body>
