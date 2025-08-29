@@ -3,44 +3,147 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Rain Check 💔</title>
+  <title>No...?</title>
+
+  <!-- font -->
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./no_style.css" />
+
+  <style>
+    body {
+      margin: 0;
+      background: #000;
+      display: grid;
+      place-items: center;
+      height: 100vh;
+      font-family: 'Poppins', sans-serif;
+      color: #fff;
+    }
+
+    /* === spider body === */
+    .spider-overlay{
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.95);
+      display: grid; place-items: center;
+      z-index: 9999;
+      opacity: 1; transition: opacity .6s ease;
+      cursor: pointer;
+    }
+    .spider-overlay.fade{ opacity: 0; pointer-events: none; }
+
+    .spider-wrap{
+      display: grid; place-items: center;
+      animation: popIn .6s ease both;
+    }
+    @keyframes popIn{
+      from{ transform: scale(.6); filter: blur(2px); opacity: .2; }
+      to{ transform: scale(1); filter: blur(0); opacity: 1; }
+    }
+
+    .spider-svg{ width: min(60vmin, 520px); height: auto; }
+    .spider-hint{
+      margin-top: 10px;
+      color: #bbb; font-size: 14px;
+      text-align: center; opacity: .85;
+    }
+
+    /* red eyes */
+    .spider-eye{ animation: glow 1s alternate infinite; }
+    @keyframes glow{
+      from{ fill:#ff3333; filter: drop-shadow(0 0 4px #ff3333); }
+      to{ fill:#ff6666; filter: drop-shadow(0 0 8px #ff6666); }
+    }
+
+    /* second chance */
+    .second-chance{
+      display: none; text-align: center;
+      max-width: 600px; padding: 20px;
+    }
+    .second-chance.show{ display: block; animation: fadeUp .6s ease; }
+    @keyframes fadeUp{
+      from{ opacity: 0; transform: translateY(10px); }
+      to{ opacity: 1; transform: translateY(0); }
+    }
+    .second-chance h2{
+      font-family: 'Playfair Display', serif;
+      font-size: 28px; margin: 0 0 12px;
+    }
+    .second-chance p{ margin: 0 0 20px; font-size: 18px; color: #ddd; }
+
+    .chance-actions{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+    .chance-btn{
+      background:#222; color:#fff; border:1px solid #444;
+      padding:10px 16px; border-radius:10px; cursor:pointer; font-weight:600;
+      font-family: 'Poppins', sans-serif;
+      transition: all .2s ease;
+    }
+    .chance-btn:hover{ background:#333; }
+    .chance-btn.primary{ border-color:#ff607d; color:#ffdbe4; }
+  </style>
 </head>
 <body>
-  <div class="cloud cloud-1"></div>
-  <div class="cloud cloud-2"></div>
-  <div class="cloud cloud-3"></div>
 
-  <main class="wrap" aria-live="polite">
-    <div class="emoji" aria-hidden="true">😢</div>
-    <h1>Rain check...</h1>
-    <p class="sub">
-      Aww… you said no 💔<br/>
-      I’ll be here, waiting with <strong>double dessert</strong> 🍰🍨
-    </p>
-
-    <div class="cta">
-      <button class="btn" id="back">Back to invite</button>
+  <!-- spider -->
+  <div class="spider-overlay" id="spider">
+    <div class="spider-wrap">
+      <svg class="spider-svg" viewBox="0 0 512 512">
+        <g fill="#111">
+          <!-- body -->
+          <ellipse cx="256" cy="250" rx="110" ry="120" fill="#0d0d0f"/>
+          <ellipse cx="256" cy="160" rx="70" ry="55" fill="#121216"/>
+          
+          <!-- eyes -->
+          <circle class="spider-eye" cx="226" cy="150" r="10"/>
+          <circle class="spider-eye" cx="246" cy="140" r="8"/>
+          <circle class="spider-eye" cx="266" cy="140" r="8"/>
+          <circle class="spider-eye" cx="286" cy="150" r="10"/>
+          <circle class="spider-eye" cx="236" cy="165" r="7"/>
+          <circle class="spider-eye" cx="256" cy="168" r="7"/>
+          <circle class="spider-eye" cx="276" cy="165" r="7"/>
+          <circle class="spider-eye" cx="256" cy="150" r="6"/>
+          
+          <!-- legs -->
+          <path d="M180 180 C120 170, 80 140, 60 110" stroke="#141418" stroke-width="16" fill="none"/>
+          <path d="M332 180 C392 170, 432 140, 452 110" stroke="#141418" stroke-width="16" fill="none"/>
+          <path d="M170 220 C120 220, 70 210, 40 190" stroke="#141418" stroke-width="16" fill="none"/>
+          <path d="M342 220 C392 220, 442 210, 472 190" stroke="#141418" stroke-width="16" fill="none"/>
+          <path d="M170 260 C120 280, 70 300, 40 320" stroke="#141418" stroke-width="16" fill="none"/>
+          <path d="M342 260 C392 280, 442 300, 472 320" stroke="#141418" stroke-width="16" fill="none"/>
+          
+          <!-- rope -->
+          <rect x="252" y="0" width="8" height="120" fill="#1c1c22"/>
+        </g>
+      </svg>
+      <div class="spider-hint">tap to continue</div>
     </div>
-  </main>
+  </div>
+
+  <!-- second message -->
+  <div class="second-chance" id="chance">
+    <h2>I can't believe you say no.</h2>
+    <p>I give you a chance to choice again.</p>
+    <div class="chance-actions">
+      <button class="chance-btn" id="again">Choose again</button>
+      <button class="chance-btn primary" id="yes">…ok fine, YES</button>
+    </div>
+  </div>
 
   <script>
-    const colors = ['#78b7ff','#6fb0f7','#8dc6ff'];
-    function makeDrop(){
-      const d = document.createElement('span');
-      d.className = 'raindrop';
-      d.style.left = Math.random()*100 + 'vw';
-      d.style.animationDuration = (0.9 + Math.random()*1.6) + 's';
-      d.style.opacity = 0.6 + Math.random()*0.35;
-      d.style.background = colors[(Math.random()*colors.length)|0];
-      document.body.appendChild(d);
-      setTimeout(()=> d.remove(), 2600);
-    }
-    setInterval(makeDrop, 90);
+    const spider = document.getElementById('spider');
+    const chance = document.getElementById('chance');
 
-    document.getElementById('back').addEventListener('click', ()=>{
-      window.location.href = 'index.html';   
+    spider.addEventListener('click', ()=>{
+      spider.classList.add('fade');
+      setTimeout(()=>{
+        spider.style.display = 'none';
+        chance.classList.add('show');
+      }, 600);
+    }, { once: true });
+
+    document.getElementById('again').addEventListener('click', ()=>{
+      window.location.href = 'index.html';
+    });
+    document.getElementById('yes').addEventListener('click', ()=>{
+      window.location.href = 'yes_page.html';
     });
   </script>
 </body>
