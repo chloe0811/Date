@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rain Check 💔</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./no_style.css" />
+</head>
+<body>
+  <div class="cloud cloud-1"></div>
+  <div class="cloud cloud-2"></div>
+  <div class="cloud cloud-3"></div>
+
+  <main class="wrap" aria-live="polite">
+    <div class="emoji" aria-hidden="true">😢</div>
+    <h1>Rain check...</h1>
+    <p class="sub">
+      Aww… you said no 💔<br/>
+      I’ll be here, waiting with <strong>double dessert</strong> 🍰🍨
+    </p>
+
+    <div class="cta">
+      <button class="btn" id="back">Back to invite</button>
+    </div>
+  </main>
+
+  <script>
+    const colors = ['#78b7ff','#6fb0f7','#8dc6ff'];
+    function makeDrop(){
+      const d = document.createElement('span');
+      d.className = 'raindrop';
+      d.style.left = Math.random()*100 + 'vw';
+      d.style.animationDuration = (0.9 + Math.random()*1.6) + 's';
+      d.style.opacity = 0.6 + Math.random()*0.35;
+      d.style.background = colors[(Math.random()*colors.length)|0];
+      document.body.appendChild(d);
+      setTimeout(()=> d.remove(), 2600);
+    }
+    setInterval(makeDrop, 90);
+
+    document.getElementById('back').addEventListener('click', ()=>{
+      window.location.href = 'index.html';   
+    });
+  </script>
+</body>
+</html>
