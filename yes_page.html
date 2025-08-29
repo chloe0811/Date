@@ -148,7 +148,7 @@
 
     // ====== SEND CONFIRMATION TO YOU ======
     // Your Google Apps Script /exec endpoint
-    const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbybRs2GS1LA_xt-FbOX_8muBKHc6zvhEKxJFD6NoRJwVsir8U5reOBjTbZo_pzGDVXc/exec"; // <- your /exec URL
+    const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz8SHkEaxKdTcMJ2NCtv6SlH9KJ3hOuMc9gjSeGYjot30cMequgDM8ayPwMKLjnHeFM/exec"; // <- your /exec URL
 
     async function notifyOwner(place, time){
       const payload = { place, time, at: new Date().toISOString(), ua: navigator.userAgent };
