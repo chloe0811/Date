@@ -146,25 +146,26 @@
     });
     cancelBtn.addEventListener('click', ()=> popup.classList.remove('show') );
 
-    // ====== SEND CONFIRMATION TO YOU (optional) ======
-    // Put your webhook / endpoint here (Discord/Slack/Google Apps Script, etc.).
-    // If left empty, it will skip silently.
-    const WEBHOOK_URL = ""; // e.g., "https://discord.com/api/webhooks/XXXX/XXXX"
+    // ====== SEND CONFIRMATION TO YOU ======
+    // Your Google Apps Script /exec endpoint
+    const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbybRs2GS1LA_xt-FbOX_8muBKHc6zvhEKxJFD6NoRJwVsir8U5reOBjTbZo_pzGDVXc/exec"; // <- your /exec URL
 
     async function notifyOwner(place, time){
-      if(!WEBHOOK_URL) return; // skip if not set
-      const payload = {
-        place, time,
-        at: new Date().toISOString(),
-        ua: navigator.userAgent
-      };
-      try{
-        await fetch(WEBHOOK_URL, {
+      const payload = { place, time, at: new Date().toISOString(), ua: navigator.userAgent };
+      try {
+        const res = await fetch(WEBHOOK_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
-      }catch(e){ /* ignore errors silently */ }
+        // Try to read JSON { ok: true }
+        const data = await res.json().catch(()=>null);
+        if (!res.ok || !data || data.ok !== true) {
+          console.warn('Webhook not acknowledged', res.status, data);
+        }
+      } catch (e) {
+        console.warn('Webhook error', e);
+      }
     }
 
     confirmBtn.addEventListener('click', async ()=>{
