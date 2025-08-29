@@ -7,8 +7,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
     :root{
-      --bg:#f6dadb; --paper:#fff8f6; --ink:#2b2b2b; --accent:#d32f2f;
-      --muted:#7a5c5c; --card-shadow:0 14px 28px rgba(0,0,0,.12); --green:#4caf50;
+      --bg:#f6dadb; --paper:#fff8f6; --ink:#2b2b2b; --accent:#d32f2f; --muted:#7a5c5c;
+      --card-shadow:0 14px 28px rgba(0,0,0,.12); --green:#4caf50;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
@@ -21,29 +21,27 @@
     .card{
       width:min(820px,94vw); background:var(--paper); border:1.5px solid #f1d7d7;
       border-radius:18px; padding:28px 22px; box-shadow:var(--card-shadow);
-      text-align:center;
+      text-align:center; position:relative;
     }
-    h1{margin:0 0 10px; font-family:'Playfair Display',serif; font-weight:700; color:var(--accent);
-       font-size:clamp(26px,4.5vw,42px);}
-    .sub{margin:6px 0 18px; color:var(--muted); font-size:clamp(14px,2.7vw,16px);}
-    .when{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin:12px 0;}
-    .pill{border:1px solid #e8caca; background:#fff; color:#5b4a4a; padding:10px 14px;
-          border-radius:999px; cursor:pointer; font-weight:600; font-size:15px;
-          box-shadow:0 6px 14px rgba(0,0,0,.06);}
-    .pill.active{background:#4caf50; color:#fff; border-color:#4caf50;}
-    .timer{margin:14px auto 8px; display:flex; gap:16px; justify-content:center; flex-wrap:wrap;}
-    .block{background:#fff; border:1px solid #f0d6d6; border-radius:16px;
-           padding:18px 16px; min-width:92px; box-shadow:0 10px 20px rgba(0,0,0,.06);
-           display:grid; gap:4px; place-items:center;}
-    .num{font-size:clamp(28px,7vw,56px); font-weight:700; color:#c2185b;}
-    .lab{font-size:12px; color:#7a5c5c; text-transform:uppercase;}
-    .ready{font-family:'Playfair Display',serif; font-size:clamp(22px,5vw,38px); color:#c2185b; margin-top:12px; display:none;}
-    .ready.show{display:block; animation: pop .5s ease both}
+    h1{ margin:0 0 10px; font-family:'Playfair Display',serif; font-weight:700; color:var(--accent); font-size:clamp(26px,4.5vw,42px); }
+    .sub{ margin:6px 0 10px; color:var(--muted); font-size:clamp(14px,2.7vw,16px); }
+    .badge{
+      display:inline-block; margin:6px 0 12px; padding:8px 12px; border-radius:999px;
+      background:#fff; border:1px solid #f0d6d6; box-shadow:0 6px 14px rgba(0,0,0,.06); font-weight:700;
+    }
+    .when{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin:12px 0; }
+    .pill{ border:1px solid #e8caca; background:#fff; color:#5b4a4a; padding:10px 14px; border-radius:999px; cursor:pointer; font-weight:600; font-size:15px; box-shadow:0 6px 14px rgba(0,0,0,.06); user-select:none; }
+    .pill.active{ background:#4caf50; color:#fff; border-color:#4caf50; }
+    .timer{ margin:14px auto 8px; display:flex; gap:16px; justify-content:center; flex-wrap:wrap; }
+    .block{ background:#fff; border:1px solid #f0d6d6; border-radius:16px; padding:18px 16px; min-width:92px; box-shadow:0 10px 20px rgba(0,0,0,.06); display:grid; gap:4px; place-items:center; }
+    .num{ font-size:clamp(28px,7vw,56px); font-weight:700; color:#c2185b; }
+    .lab{ font-size:12px; color:#7a5c5c; text-transform:uppercase; }
+    .ready{ font-family:'Playfair Display',serif; font-size:clamp(22px,5vw,38px); color:#c2185b; margin-top:12px; display:none; }
+    .ready.show{ display:block; animation: pop .5s ease both }
     @keyframes pop{from{transform:scale(.98);opacity:0}to{transform:scale(1);opacity:1}}
-    .cta{margin-top:20px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;}
-    .btn{border:0; border-radius:12px; padding:12px 16px; cursor:pointer; font-weight:700; font-size:16px;}
-    .btn-primary{background:var(--green); color:#fff}
-    .btn-ghost{background:#fff; color:#555; border:1px solid #e6caca}
+    .cta{ margin-top:18px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+    .btn{ border:0; border-radius:12px; padding:12px 16px; cursor:pointer; font-weight:700; font-size:16px; }
+    .btn-primary{ background:var(--green); color:#fff } .btn-ghost{ background:#fff; color:#555; border:1px solid #e6caca }
   </style>
 </head>
 <body>
@@ -51,12 +49,16 @@
     <h1>Tonight’s romantic countdown</h1>
     <div class="sub">Pick a time and I’ll count you down to our table ✨</div>
 
+    <!-- shows immediately what he confirmed -->
+    <div id="choiceBadge" class="badge" style="display:none;"></div>
+
     <div class="when">
-      <button class="pill active" data-h="19" data-m="30">7:30 PM</button>
+      <button class="pill" data-h="19" data-m="30">7:30 PM</button>
       <button class="pill" data-h="20" data-m="0">8:00 PM</button>
+      <button class="pill" data-h="20" data-m="15">8:15 PM</button>
     </div>
 
-    <section class="timer">
+    <section class="timer" aria-label="Countdown">
       <div class="block"><div class="num" id="hh">--</div><div class="lab">hours</div></div>
       <div class="block"><div class="num" id="mm">--</div><div class="lab">minutes</div></div>
       <div class="block"><div class="num" id="ss">--</div><div class="lab">seconds</div></div>
@@ -66,34 +68,55 @@
 
     <div class="cta">
       <button class="btn btn-primary" id="back">Back to invite</button>
-      <button class="btn btn-ghost" id="prefer">I prefer this one</button>
+      <button class="btn btn-ghost" id="yes">I’m already here</button>
     </div>
   </main>
 
   <script>
-    const hh=document.getElementById('hh'),mm=document.getElementById('mm'),ss=document.getElementById('ss');
+    const hh=document.getElementById('hh'), mm=document.getElementById('mm'), ss=document.getElementById('ss');
     const readyEl=document.getElementById('ready');
     const pills=[...document.querySelectorAll('.pill')];
+    const badge=document.getElementById('choiceBadge');
 
     function getTarget(h,m){
       const now=new Date(); const t=new Date();
-      t.setHours(h,m,0,0);
-      if(t<=now) t.setDate(t.getDate()+1);
+      t.setHours(h,m,0,0); if(t<=now) t.setDate(t.getDate()+1);
       return t;
     }
+    function pad(n){return String(n).padStart(2,'0');}
 
-    let active=document.querySelector('.pill.active');
-    let target=getTarget(+active.dataset.h,+active.dataset.m);
+    // read query (?place, ?time) and reflect immediately
+    const params = new URLSearchParams(window.location.search);
+    const qPlace = params.get('place');         // e.g., "Florentino"
+    const qTime  = params.get('time');          // e.g., "8:15 PM"
 
+    // show badge if we have either
+    if(qPlace || qTime){
+      badge.style.display='inline-block';
+      badge.textContent = `${qPlace ? qPlace : ''}${qPlace && qTime ? ' • ' : ''}${qTime ? qTime : ''}`;
+    }
+
+    // preselect time from query if provided
+    function matchTimeToPill(timeStr){
+      if(!timeStr) return null;
+      const m = timeStr.trim().toUpperCase();
+      return pills.find(btn => btn.textContent.trim().toUpperCase() === m) || null;
+    }
+
+    let activeBtn = matchTimeToPill(qTime) || pills[0];
+    pills.forEach(x=>x.classList.remove('active'));
+    activeBtn.classList.add('active');
+
+    let target = getTarget(+activeBtn.dataset.h, +activeBtn.dataset.m);
+
+    // allow changing time if you want (optional)
     pills.forEach(p=>{
-      p.addEventListener('click',()=>{
+      p.addEventListener('click', ()=>{
         pills.forEach(x=>x.classList.remove('active'));
         p.classList.add('active');
-        target=getTarget(+p.dataset.h,+p.dataset.m);
+        target = getTarget(+p.dataset.h, +p.dataset.m);
       });
     });
-
-    function pad(n){return String(n).padStart(2,'0');}
 
     function tick(){
       const now=new Date(); const diff=target-now;
@@ -110,13 +133,9 @@
     }
     tick();
 
-    // 按鈕功能
-    document.getElementById('back').addEventListener('click',()=>{window.location.href='index.html';});
-    document.getElementById('prefer').addEventListener('click',()=>{
-      const chosen=document.querySelector('.pill.active').textContent.trim();
-      // 跳轉到 yes_page.html 並帶上選的時間
-      window.location.href='yes_page.html?time='+encodeURIComponent(chosen);
-    });
+    // Buttons
+    document.getElementById('back').addEventListener('click', ()=>{ window.location.href='index.html'; });
+    document.getElementById('yes').addEventListener('click', ()=>{ window.location.href='yes_page.html'; });
   </script>
 </body>
 </html>
