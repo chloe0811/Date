@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tonight’s Date – Countdown</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#f6dadb;
+      --paper:#fff8f6;
+      --ink:#2b2b2b;
+      --accent:#d32f2f;
+      --muted:#7a5c5c;
+      --card-shadow:0 14px 28px rgba(0,0,0,.12);
+      --green:#4caf50;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; display:grid; place-items:center;
+      background:linear-gradient(160deg,#f6dadb 0%, #ffdfe3 40%, #ffeef1 100%);
+      color:var(--ink); font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      overflow-x:hidden;
+    }
+    .card{
+      width:min(820px,94vw);
+      background:var(--paper);
+      border:1.5px solid #f1d7d7;
+      border-radius:18px;
+      padding:28px 22px;
+      box-shadow:var(--card-shadow);
+      text-align:center;
+      position:relative;
+    }
+    h1{
+      margin:0 0 10px;
+      font-family:'Playfair Display',serif;
+      font-weight:700;
+      color:var(--accent);
+      font-size:clamp(26px,4.5vw,42px);
+      letter-spacing:.3px;
+    }
+    .sub{
+      margin:6px 0 18px; color:var(--muted);
+      font-size:clamp(14px,2.7vw,16px);
+    }
+
+    /* time picker */
+    .when{
+      display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin:8px 0 6px;
+    }
+    .pill{
+      border:1px solid #e8caca;
+      background:#fff;
+      color:#5b4a4a;
+      padding:10px 14px;
+      border-radius:999px;
+      cursor:pointer;
+      font-weight:600; font-size:15px;
+      transition: all .2s ease;
+      box-shadow:0 6px 14px rgba(0,0,0,.06);
+      user-select:none;
+    }
+    .pill.active{ background:#4caf50; color:#fff; border-color:#4caf50; }
+
+    /* countdown */
+    .timer{
+      margin:14px auto 8px;
+      display:flex; gap:16px; justify-content:center; align-items:baseline; flex-wrap:wrap;
+      font-variant-numeric: tabular-nums;
+    }
+    .block{
+      background:#fff; border:1px solid #f0d6d6; border-radius:16px;
+      padding:18px 16px; min-width:92px;
+      box-shadow:0 10px 20px rgba(0,0,0,.06);
+      display:grid; gap:4px; place-items:center;
+      animation: rise .6s ease both;
+    }
+    @keyframes rise{from{transform:translateY(6px);opacity:0}to{transform:none;opacity:1}}
+    .num{ font-size:clamp(28px,7vw,56px); font-weight:700; color:#c2185b; }
+    .lab{ font-size:12px; color:#7a5c5c; text-transform:uppercase; letter-spacing:.12em; }
+
+    .note{
+      margin-top:6px; color:#856666; font-size:13px;
+    }
+
+    .cta{
+      margin-top:16px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;
+    }
+    .btn{
+      border:0; border-radius:12px; padding:12px 16px; cursor:pointer;
+      font-weight:700; font-size:16px; box-shadow:0 6px 14px rgba(0,0,0,.08);
+    }
+    .btn-primary{ background:var(--green); color:#fff }
+    .btn-ghost{ background:#fff; color:#555; border:1px solid #e6caca }
+
+    /* ready state */
+    .ready{
+      font-family:'Playfair Display',serif; font-size:clamp(22px,5vw,38px);
+      color:#c2185b; margin-top:12px; display:none;
+    }
+    .ready.show{ display:block; animation: pop .5s ease both }
+    @keyframes pop{from{transform:scale(.98);opacity:0}to{transform:scale(1);opacity:1}}
+
+    /* soft hearts background */
+    .bg-heart{
+      position: fixed; pointer-events:none; opacity:.12; font-size:clamp(60px,12vw,140px);
+      animation: float 12s ease-in-out infinite;
+    }
+    .bg-heart.h1{ left:6%; top:8%; animation-delay:-2s }
+    .bg-heart.h2{ right:8%; bottom:10%; animation-delay:-5s }
+    @keyframes float{
+      0%,100%{ transform: translateY(0) }
+      50%{ transform: translateY(-12px) }
+    }
+
+    /* confetti hearts on ready */
+    .confetti{
+      position:fixed; top:-12px; width:10px; height:14px;
+      background:#ff6b6b; opacity:.95; z-index:9999;
+      animation: fall linear forwards;
+      border-radius:2px;
+    }
+    @keyframes fall{
+      to{ transform:translateY(100vh) rotate(360deg); opacity:0 }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-heart h1">💖</div>
+  <div class="bg-heart h2">💘</div>
+
+  <main class="card" aria-live="polite">
+    <h1>Tonight’s romantic countdown</h1>
+    <div class="sub">Pick a time and I’ll count you down to our table ✨</div>
+
+    <div class="when" role="group" aria-label="Select dinner time">
+      <button class="pill active" data-h="19" data-m="30">7:30 PM</button>
+      <button class="pill" data-h="20" data-m="0">8:00 PM</button>
+    </div>
+
+    <section class="timer" aria-label="Countdown">
+      <div class="block"><div class="num" id="hh">--</div><div class="lab">hours</div></div>
+      <div class="block"><div class="num" id="mm">--</div><div class="lab">minutes</div></div>
+      <div class="block"><div class="num" id="ss">--</div><div class="lab">seconds</div></div>
+    </section>
+
+    <div class="ready" id="ready">Table’s ready — let’s go 💞</div>
+    <div class="note" id="note">If the time has already passed today, I’ll count to tomorrow 💡</div>
+
+    <div class="cta">
+      <button class="btn btn-primary" id="back">Back to invite</button>
+      <button class="btn btn-ghost" id="yes">I’m already here</button>
+    </div>
+  </main>
+
+  <script>
+    // === Utilities ===
+    const hh = document.getElementById('hh');
+    const mm = document.getElementById('mm');
+    const ss = document.getElementById('ss');
+    const readyEl = document.getElementById('ready');
+
+    const pills = Array.from(document.querySelectorAll('.pill'));
+    const stored = JSON.parse(localStorage.getItem('date_time') || 'null');
+    if(stored){
+      pills.forEach(p=>p.classList.toggle('active', p.dataset.h==stored.h && p.dataset.m==stored.m));
+    }
+
+    function getTarget(h=19, m=30){
+      const now = new Date();
+      const target = new Date();
+      target.setHours(h, m, 0, 0);
+      if(target <= now){ // if passed, count to tomorrow
+        target.setDate(target.getDate() + 1);
+      }
+      return target;
+    }
+
+    let active = document.querySelector('.pill.active');
+    let target = getTarget(+active.dataset.h, +active.dataset.m);
+    localStorage.setItem('date_time', JSON.stringify({h:+active.dataset.h, m:+active.dataset.m}));
+
+    pills.forEach(p=>{
+      p.addEventListener('click', ()=>{
+        pills.forEach(x=>x.classList.remove('active'));
+        p.classList.add('active');
+        target = getTarget(+p.dataset.h, +p.dataset.m);
+        localStorage.setItem('date_time', JSON.stringify({h:+p.dataset.h, m:+p.dataset.m}));
+      });
+    });
+
+    function pad(n){ return String(n).padStart(2,'0'); }
+
+    // Hearts confetti when ready
+    const colors = ["#ff6b6b","#feca57","#48dbfb","#1dd1a1","#ff9ff3","#54a0ff","#5f27cd","#ffd93d"];
+    function oneConfetti(){
+      const el = document.createElement('div');
+      el.className = 'confetti';
+      el.style.left = Math.random()*100 + 'vw';
+      el.style.backgroundColor = colors[(Math.random()*colors.length)|0];
+      el.style.width = (6 + Math.random()*6) + 'px';
+      el.style.height = (8 + Math.random()*10) + 'px';
+      el.style.animationDuration = (3 + Math.random()*2) + 's';
+      el.style.transform = `rotate(${Math.random()*360}deg)`;
+      document.body.appendChild(el);
+      setTimeout(()=> el.remove(), 5200);
+    }
+    function confettiSnow(durationMs=6000, everyMs=120){
+      const iv = setInterval(oneConfetti, everyMs);
+      setTimeout(()=> clearInterval(iv), durationMs);
+    }
+
+    function tick(){
+      const now = new Date();
+      const diff = target - now;
+      if(diff <= 0){
+        hh.textContent = '00';
+        mm.textContent = '00';
+        ss.textContent = '00';
+        if(!readyEl.classList.contains('show')){
+          readyEl.classList.add('show');
+          confettiSnow(6000, 110);
+        }
+        return;
+      }
+      const totalSeconds = Math.floor(diff/1000);
+      const hours = Math.floor(totalSeconds/3600);
+      const minutes = Math.floor((totalSeconds%3600)/60);
+      const seconds = totalSeconds%60;
+      hh.textContent = pad(hours);
+      mm.textContent = pad(minutes);
+      ss.textContent = pad(seconds);
+      requestAnimationFrame(()=>setTimeout(tick, 250)); // smooth-ish update
+    }
+    tick();
+
+    // Buttons
+    document.getElementById('back').addEventListener('click', ()=>{ window.location.href='index.html'; });
+    document.getElementById('yes').addEventListener('click', ()=>{ window.location.href='yes_page.html'; });
+  </script>
+</body>
+</html>
